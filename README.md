@@ -1,6 +1,7 @@
-# Delta Offset Encoding
+# Quick Compression
 
-Compress 4 numbers (u32) at once.
+Compression that works on just 4 numbers at once.
+Employs nullsupression and delta-, offset encoding.
 
 ## Compression Scheme
 
@@ -30,14 +31,18 @@ where a encodes the first index and so forth.
 
 ### Storing initial offset
 
-offset only needs to be stored byte aligned, for this is a byte aligned scheme.
-That means we have 4 options for our offset: 0, 0xff, 0xffff, 0xffffff
-2 bits are needed to encode that, the mapping is as follows:
+We have 4 bits left to store our offset.
+That means we have 8 options for our offset.
+The mapping of bits to offset is as follows:
 
-$$ 00_b \mapsto 0_x $$
-$$ 01_b \mapsto ff_x $$
-$$ 10_b \mapsto ffff_x $$
-$$ 11_b \mapsto ffffff_x $$
+$$ 000_b \mapsto 0_x $$
+$$ 001_b \mapsto f_x $$
+$$ 010_b \mapsto ff_x $$
+$$ 011_b \mapsto fff_x $$
+$$ 100_b \mapsto ffff_x $$
+$$ 101_b \mapsto fffff_x $$
+$$ 110_b \mapsto ffffff_x $$
+$$ 111_b \mapsto fffffff_x $$
 
 
 These bits xy are stored in the same byte as the sorting order, like this:  `0xyaabbc`

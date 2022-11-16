@@ -48,10 +48,9 @@ fn remaining(a: u8, b: u8) -> (u8, u8) {
 
 /// Retuns the proper sorting order and the numbers, sorted.
 pub fn sorting_order(nums: [u32; 4]) -> ([u8; 4], [u32; 4]) {
-    let mut mindex = 0;
-    let mut maxdex = 0;
+    let (mut mindex, mut maxdex) = if nums[0] < nums[1] { (0, 1) } else { (1, 0) };
 
-    for i in 0..4 {
+    for i in 2..=3 {
         if nums[i] < nums[mindex] {
             mindex = i;
         }
@@ -61,6 +60,9 @@ pub fn sorting_order(nums: [u32; 4]) -> ([u8; 4], [u32; 4]) {
             maxdex = i;
         }
     }
+
+    dbg!(mindex);
+    dbg!(maxdex);
 
     // binary encoding if numbers for faster matching
     let index = mindex << 2 | maxdex;
@@ -155,7 +157,7 @@ pub fn sorting_order(nums: [u32; 4]) -> ([u8; 4], [u32; 4]) {
                 [2, 1, 0, 3]
             }
         }
-        _ => unreachable!("these bit patterns can be proven to not exist"),
+        x => unreachable!("these bit patterns can be proven to not exist: 0b{x:b}"),
     };
 
     // TODO verify bounds checks get optimized out

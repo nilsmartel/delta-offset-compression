@@ -5,14 +5,32 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {}
+    fn it_works() {
+        let cases = [
+            [0u32, 0, 0, 0],
+            [0, 1, 2, 3],
+            [123, 123, 123, 234],
+            [255, 0, 0, 0],
+            [255, 2, 3, 6],
+        ];
+
+        let mut buffer = Vec::new();
+        for c in cases {
+            encode_4(&mut buffer, c);
+            let (rest, result) = decode_4(&buffer);
+            assert_eq!(rest, b"", "no data remains after decoding");
+
+            assert_eq!(result, c, "same numbers before and after decoding");
+            buffer.clear();
+        }
+    }
 }
 
 pub fn decode_4(data: &[u8]) -> (&[u8], [u32; 4]) {
     let byte = data[0];
     let order = byte & 0b11111;
     let order = sorting::decode_sorting_order(order);
-    let offset = (byte >> 5) & 0b11;
+    let offset = byte >> 5;
     let offset = decode_offset(offset);
 
     let (rest, mut nums) = group_varint_encoding::decompress_4(&data[1..]);
@@ -42,16 +60,20 @@ pub fn encode_4(buffer: &mut Vec<u8>, ns: [u32; 4]) {
 
 fn decode_offset(offset: u8) -> u32 {
     match offset {
-        0 => 0,
-        1 => 0xff,
-        2 => 0xffff,
-        3 => 0xffffff,
+        0b000 => 0x0,
+        0b001 => 0xf,
+        0b010 => 0xff,
+        0b011 => 0xfff,
+        0b100 => 0xffff,
+        0b101 => 0xfffff,
+        0b110 => 0xffffff,
+        0b111 => 0xfffffff,
         _ => unreachable!("error in implementation"),
     }
 }
 
 fn best_offset(n: u32) -> u8 {
-    for offset in [3, 2, 1] {
+    for offset in [7, 6, 5, 4, 3, 2, 1] {
         if decode_offset(offset) <= n {
             return offset;
         }
