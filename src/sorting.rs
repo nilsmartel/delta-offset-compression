@@ -42,7 +42,9 @@ fn remaining(a: u8, b: u8) -> (u8, u8) {
 
         (1, 2) => (0, 3),
         (1, 3) => (0, 2),
-        _ => unreachable!("error in implementation"),
+
+        (2, 3) => (0, 1),
+        _ => unreachable!("error in implementation. a:{a}, b:{b}"),
     }
 }
 

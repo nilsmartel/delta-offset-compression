@@ -68,12 +68,12 @@ fn decode_offset(offset: u8) -> u32 {
         0b101 => 0xfffff,
         0b110 => 0xffffff,
         0b111 => 0xfffffff,
-        _ => unreachable!("error in implementation"),
+        _ => unreachable!("error in implementation, offset: 0b{offset:b}"),
     }
 }
 
 fn best_offset(n: u32) -> u8 {
-    for offset in [7, 6, 5, 4, 3, 2, 1] {
+    for offset in (1..=0b111).rev() {
         if decode_offset(offset) <= n {
             return offset;
         }
