@@ -61,9 +61,6 @@ pub fn sorting_order(nums: [u32; 4]) -> ([u8; 4], [u32; 4]) {
         }
     }
 
-    dbg!(mindex);
-    dbg!(maxdex);
-
     // binary encoding if numbers for faster matching
     let index = mindex << 2 | maxdex;
     // we have 4 * 3 options for min and maxdex
