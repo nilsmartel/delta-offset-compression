@@ -13,22 +13,22 @@ pub fn encode_sorting_order(order: [u8; 4]) -> u8 {
 pub fn decode_sorting_order(order: u8) -> [u8; 4] {
     // 000aabbc
     let max = order >> 3;
-    let min = (order >> 1) & 0b11;
+    let max2nd = (order >> 1) & 0b11;
 
     // get the numbers in between.
-    let (a, b) = if min > max {
-        remaining(max, min)
+    let (a, b) = if max2nd > max {
+        remaining(max, max2nd)
     } else {
-        remaining(min, max)
+        remaining(max2nd, max)
     };
 
     let c = (order & 1) == 1;
 
     if c {
         // a and b need to switch
-        [min, b, a, max]
+        [b, a, max2nd, max]
     } else {
-        [min, a, b, max]
+        [a, b, max2nd, max]
     }
 }
 
