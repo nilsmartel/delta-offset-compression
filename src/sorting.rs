@@ -56,6 +56,8 @@ pub fn sorting_order(nums: [u32; 4]) -> ([u8; 4], [u32; 4]) {
         }
         // since both numbers are the same to begin with
         // it's safe to only ever adjust one.
+        // also, we need this else clause to be sure that
+        // mindex != maxdex
         else if nums[i] > nums[maxdex] {
             maxdex = i;
         }
