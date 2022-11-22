@@ -41,8 +41,7 @@ pub fn decode_4(data: &[u8]) -> (&[u8], [u32; 4]) {
         nums[i] += nums[i - 1];
     }
 
-    // TODO check that no bound checks are inserted here. (e.g. they get optimized out)
-    let nums = order.map(|i| nums[i as usize]);
+    let nums = sorting::apply_encoding(nums, order);
 
     (rest, nums)
 }

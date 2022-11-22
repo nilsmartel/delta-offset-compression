@@ -1,3 +1,129 @@
+#[cfg(test)]
+mod tests {
+    use std::collections::HashSet;
+
+    use super::*;
+
+    fn assert_sorted(nums: [u32; 4]) {
+        nums.iter()
+            .zip(&nums[1..])
+            .for_each(|(n, n_1)| assert!(n <= n_1))
+    }
+
+    #[test]
+    fn sorting() {
+        let input = permut().into_iter().map(|x| x.map(|i| i as u32));
+
+        for nums in input {
+            let (_encoding, result) = sorting_order(nums);
+            // verify that the result is actually sorted
+            assert_sorted(result);
+        }
+    }
+
+    #[test]
+    fn sorting_encoding() {
+        let input = permut().into_iter().map(|x| x.map(|i| i as u32));
+
+        for nums in input {
+            let (encoding, _result) = sorting_order(nums);
+            for i in [1, 2, 3] {
+                assert!(
+                    nums[encoding[i] as usize] >= nums[encoding[i - 1] as usize],
+                    "expect encoding to be right"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn encoding_applied() {
+        let input = permut().into_iter().map(|x| x.map(|i| i as u32));
+
+        for nums in input {
+            let (encoding, result) = sorting_order(nums);
+            // verify that sorting encoding matches output
+            let r1 = apply_encoding(nums, encoding);
+            assert_eq!(
+                r1, result,
+                "expect to match {result:?} after order-encoding is applied"
+            );
+        }
+    }
+
+    fn permut() -> Vec<[u8; 4]> {
+        // should be all, we need !4, so 4*3 = 12, 12*2 = 24, looks about right
+        let e = vec![
+            // 0 starting
+            [0, 1, 2, 3],
+            [0, 1, 3, 2],
+            [0, 2, 1, 3],
+            [0, 2, 3, 1],
+            [0, 3, 1, 2],
+            [0, 3, 2, 1],
+            // 1 starting
+            [1, 2, 3, 0],
+            [1, 2, 0, 3],
+            [1, 3, 2, 0],
+            [1, 3, 0, 2],
+            [1, 0, 2, 3],
+            [1, 0, 3, 2],
+            // 2 starting
+            [2, 1, 0, 3],
+            [2, 1, 3, 0],
+            [2, 0, 1, 3],
+            [2, 0, 3, 1],
+            [2, 3, 1, 0],
+            [2, 3, 0, 1],
+            // 3 starting
+            [3, 2, 1, 0],
+            [3, 2, 0, 1],
+            [3, 1, 2, 0],
+            [3, 1, 0, 2],
+            [3, 0, 2, 1],
+            [3, 0, 1, 2],
+        ];
+
+        let permutations = 24;
+        assert_eq!(e.len(), permutations, "expect {permutations} permutations");
+
+        // i know this is dumb, but I have to work on my thesis and I'm so tired
+        for i in 0..permutations {
+            assert_eq!(
+                e[i].iter().cloned().collect::<HashSet<_>>().len(),
+                4,
+                "expect 4 distinct elements in {i}th element of permutations"
+            );
+
+            for j in 0..permutations {
+                if i == j {
+                    continue;
+                }
+
+                assert_ne!(
+                    e[i], e[j],
+                    "expect no two elements of the vector to be the same"
+                );
+            }
+        }
+
+        e
+    }
+
+    #[test]
+    fn order_encoding() {
+        // first generate all permutations of 0,1,2,3
+        let p = permut();
+
+        for p1 in p {
+            let e = encode_sorting_order(p1);
+
+            let decoded = decode_sorting_order(e);
+
+            assert_eq!(decoded, p1, "expect to match sorting order {p1:?}");
+        }
+    }
+}
 pub fn encode_sorting_order(order: [u8; 4]) -> u8 {
     // 000aabbc
 
@@ -161,8 +287,14 @@ pub fn sorting_order(nums: [u32; 4]) -> ([u8; 4], [u32; 4]) {
         x => unreachable!("these bit patterns can be proven to not exist: 0b{x:b}"),
     };
 
-    // TODO verify bounds checks get optimized out
-    let nums = res.map(|i| nums[i as usize]);
+    let nums = apply_encoding(nums, res);
 
     (res, nums)
+}
+
+pub(crate) fn apply_encoding(input: [u32; 4], encoding: [u8; 4]) -> [u32; 4] {
+    // TODO check that no bound checks are inserted here. (e.g. they get optimized out)
+    encoding.map(|i|
+        // get element of input at position i
+        input[i as usize])
 }
