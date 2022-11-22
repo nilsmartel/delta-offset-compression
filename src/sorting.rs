@@ -11,6 +11,27 @@ mod tests {
     }
 
     #[test]
+    fn order_inversion() {
+        // just gather some random test data
+        let testdata = permut().into_iter().map(|x| x.map(|i| i as u32));
+        let encodings = permut();
+
+        for t in testdata {
+            for encoding in encodings.iter().cloned() {
+                let t1 = apply_encoding(t, encoding);
+                let inverse_encoding = inverse_encoding(encoding);
+
+                let result = apply_encoding(t1, inverse_encoding);
+
+                assert_eq!(
+                    result, t,
+                    "expect inverse encoding applied to encoding to preduce original input value"
+                );
+            }
+        }
+    }
+
+    #[test]
     fn sorting() {
         let input = permut().into_iter().map(|x| x.map(|i| i as u32));
 
@@ -297,4 +318,8 @@ pub(crate) fn apply_encoding(input: [u32; 4], encoding: [u8; 4]) -> [u32; 4] {
     encoding.map(|i|
         // get element of input at position i
         input[i as usize])
+}
+
+pub(crate) fn inverse_encoding(encoding: [u8; 4]) -> [u8; 4] {
+    todo!("implement algorithm to reverse encoding")
 }

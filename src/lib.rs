@@ -28,19 +28,26 @@ mod tests {
 }
 
 pub fn decode_4(data: &[u8]) -> (&[u8], [u32; 4]) {
-    let byte = data[0];
-    let order = byte & 0b11111;
+    let encoded_decoding_info = data[0];
+    // the first 5 bits are the encoded order.
+    let order = encoded_decoding_info & 0b11111;
     let order = sorting::decode_sorting_order(order);
-    let offset = byte >> 5;
+    let offset = encoded_decoding_info >> 5;
     let offset = decode_offset(offset);
 
     let (rest, mut nums) = group_varint_encoding::decompress_4(&data[1..]);
 
+    // resolve delta encoding
+    // afterwards all numbers should be sorted.
     nums[0] += offset;
     for i in [1, 2, 3] {
         nums[i] += nums[i - 1];
     }
 
+    // TODO we don't want to apply the order a second time
+    // we want the inverse
+
+    let order = sorting::inverse_encoding(order);
     let nums = sorting::apply_encoding(nums, order);
 
     (rest, nums)
@@ -51,10 +58,11 @@ pub fn encode_4(buffer: &mut Vec<u8>, ns: [u32; 4]) {
 
     let (block, order, offset) = delta_encode(ns);
 
-    let byte = sorting::encode_sorting_order(order) | (offset << 5);
+    let encoded_decoding_info = sorting::encode_sorting_order(order) | (offset << 5);
 
-    buffer.push(byte);
+    buffer.push(encoded_decoding_info);
 
+    // let group varint encoding compress the remaining block for us.
     compress_block(buffer, block);
 }
 
@@ -72,6 +80,7 @@ fn decode_offset(offset: u8) -> u32 {
     }
 }
 
+// returns the best offset for a given number, encoded
 fn best_offset(n: u32) -> u8 {
     for offset in (1..=0b111).rev() {
         // check that this offset is not greater than n itself.
@@ -85,19 +94,22 @@ fn best_offset(n: u32) -> u8 {
 }
 
 // returns delta encoded numbers, sorting order and initial offset (pre encoded)
-fn delta_encode(ns: [u32; 4]) -> ([u32; 4], [u8; 4], u8) {
+fn delta_encode(nums: [u32; 4]) -> ([u32; 4], [u8; 4], u8) {
     // sort numbers
-    let (order, ns) = sorting::sorting_order(ns);
+    let (order, nums) = sorting::sorting_order(nums);
     // pick lowest number first.
-    let first = ns[0];
+    let first = nums[0];
     let offset = best_offset(first);
     let first_ = first - decode_offset(offset);
 
     // TODO SIMD here? (and then overwrite first)
+
+    // res are the values subtracted from one another
+    // works fine because sorting order is preserved
     let mut res = [first_, 0, 0, 0];
     for i in [1, 2, 3] {
-        // TODO ensure that this is unchecked.
-        res[i] = ns[i] - ns[i - 1];
+        // TODO ensure that subtraction is not checked
+        res[i] = nums[i] - nums[i - 1];
     }
 
     (res, order, offset)
