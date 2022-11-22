@@ -61,19 +61,22 @@ pub fn encode_4(buffer: &mut Vec<u8>, ns: [u32; 4]) {
 fn decode_offset(offset: u8) -> u32 {
     match offset {
         0b000 => 0x0,
-        0b001 => 0xf,
-        0b010 => 0xff,
-        0b011 => 0xfff,
-        0b100 => 0xffff,
-        0b101 => 0xfffff,
-        0b110 => 0xffffff,
-        0b111 => 0xfffffff,
+        0b001 => 0xff,
+        0b010 => 0xfff,
+        0b011 => 0xffff,
+        0b100 => 0xfffff,
+        0b101 => 0xffffff,
+        0b110 => 0xfffffff,
+        0b111 => 0xffffffff,
         _ => unreachable!("error in implementation, offset: 0b{offset:b}"),
     }
 }
 
 fn best_offset(n: u32) -> u8 {
     for offset in (1..=0b111).rev() {
+        // check that this offset is not greater than n itself.
+        // and pick the first one for which it applies.
+        // Works because we start checking the big ones.
         if decode_offset(offset) <= n {
             return offset;
         }

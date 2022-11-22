@@ -36,13 +36,13 @@ That means we have 8 options for our offset.
 The mapping of bits to offset is as follows:
 
 $$ 000_b \mapsto 0_x $$
-$$ 001_b \mapsto f_x $$
-$$ 010_b \mapsto ff_x $$
-$$ 011_b \mapsto fff_x $$
-$$ 100_b \mapsto ffff_x $$
-$$ 101_b \mapsto fffff_x $$
-$$ 110_b \mapsto ffffff_x $$
-$$ 111_b \mapsto fffffff_x $$
+$$ 001_b \mapsto ff_x $$
+$$ 010_b \mapsto fff_x $$
+$$ 011_b \mapsto ffff_x $$
+$$ 100_b \mapsto fffff_x $$
+$$ 101_b \mapsto ffffff_x $$
+$$ 110_b \mapsto fffffff_x $$
+$$ 111_b \mapsto ffffffff_x $$
 
 
 These bits xy are stored in the same byte as the sorting order, like this:  `0xyaabbc`
