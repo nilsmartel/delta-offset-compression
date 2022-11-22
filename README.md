@@ -1,11 +1,24 @@
 # Quick Compression
 
-Compression that works on just 4 numbers at once.
-Employs nullsupression and delta-, offset encoding.
+Compression that works on even just 4 numbers at once.
+Scalable to gracefully handle hundreds, thousands, as many as you need.
+
+The algorithm was designed specifically for use cases where in-memory compression (think data-oriented-design) is desirable.
+
+That is, it was designed for use cases where the amount of data to be compressed at a given time greatly varies, and fine tuned to behave great, even if that number happens to drop quite low.
+
+The algorithm and implementation where fine tuned to be very quick in compression and decompression as to be useful in realtime applications.
+
+
+Advantages when employing this comression in your application are expected to be
+- reduced cache misses by lowering data footprint, increasing speed
+- reduced memory footprint
+
+_Note, these claims remain to be tested_
 
 ## Compression Scheme
 
-The Scheme compressed 4 numbers at once.
+The Scheme compressed 4 numbers at once, by employing *nullsupression, delta-, and offset encoding*.
 
 One byte, always the second one will be used for classical 4 wise group varint encoding. e.g. 1 byte to store the length of 4 integers, performing null supression.
 Also, we perform a custom deta encoding:
