@@ -10,6 +10,32 @@ mod tests {
             .for_each(|(n, n_1)| assert!(n <= n_1))
     }
 
+    /*
+    #[test]
+    fn not_actually_a_test() {
+        use std::io::Write;
+
+        let perm = permut();
+
+        let testdata = [0, 1, 2, 3];
+
+        let mut file = std::fs::File::create("./inverse-encoding-table")
+            .expect("create inverse_encoding file");
+
+        for p in perm {
+            let shuffled = apply_encoding(testdata, p);
+            for re in permut() {
+                let out = apply_encoding(shuffled, re);
+                if out == testdata {
+                    // we have found the right encoding!
+                    let p = encode_sorting_order(p);
+                    writeln!(file, "{p:02} => {re:?}").expect("write file");
+                }
+            }
+        }
+    }
+    */
+
     #[test]
     fn order_inversion() {
         // just gather some random test data
@@ -320,6 +346,32 @@ pub(crate) fn apply_encoding(input: [u32; 4], encoding: [u8; 4]) -> [u32; 4] {
         input[i as usize])
 }
 
-pub(crate) fn inverse_encoding(encoding: [u8; 4]) -> [u8; 4] {
-    todo!("implement algorithm to reverse encoding")
+pub(crate) fn inverse_encoding(encoded_order: u8) -> [u8; 4] {
+    match encoded_order {
+        02 => [3, 2, 0, 1],
+        03 => [3, 2, 1, 0],
+        04 => [3, 0, 2, 1],
+        05 => [3, 1, 2, 0],
+        06 => [3, 0, 1, 2],
+        07 => [3, 1, 0, 2],
+        08 => [2, 3, 0, 1],
+        09 => [2, 3, 1, 0],
+        12 => [0, 3, 2, 1],
+        13 => [1, 3, 2, 0],
+        14 => [0, 3, 1, 2],
+        15 => [1, 3, 0, 2],
+        16 => [2, 0, 3, 1],
+        17 => [2, 1, 3, 0],
+        18 => [0, 2, 3, 1],
+        19 => [1, 2, 3, 0],
+        22 => [0, 1, 3, 2],
+        23 => [1, 0, 3, 2],
+        24 => [2, 0, 1, 3],
+        25 => [2, 1, 0, 3],
+        26 => [0, 2, 1, 3],
+        27 => [1, 2, 0, 3],
+        28 => [0, 1, 2, 3],
+        29 => [1, 0, 2, 3],
+        _ => unreachable!("this combination should not be valid"),
+    }
 }
