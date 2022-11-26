@@ -31,7 +31,6 @@ pub fn decode_4(data: &[u8]) -> (&[u8], [u32; 4]) {
     let encoded_decoding_info = data[0];
     // the first 5 bits are the encoded order.
     let order = encoded_decoding_info & 0b11111;
-    let order = sorting::decode_sorting_order(order);
     let offset = encoded_decoding_info >> 5;
     let offset = decode_offset(offset);
 
