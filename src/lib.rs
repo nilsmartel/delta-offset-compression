@@ -2,6 +2,8 @@ mod sorting;
 
 #[cfg(test)]
 mod tests {
+    use rand::RngCore;
+
     use super::*;
 
     #[test]
@@ -25,8 +27,34 @@ mod tests {
             buffer.clear();
         }
     }
+
+    #[test]
+    fn random_tests() {
+        use rand::thread_rng;
+        let mut rng = thread_rng();
+        let cases = (0..1_000_000).map(|_| {
+            [
+                rng.next_u32(),
+                rng.next_u32(),
+                rng.next_u32(),
+                rng.next_u32(),
+            ]
+        });
+        let mut buffer = Vec::new();
+        for c in cases {
+            encode_4(&mut buffer, c);
+            let (rest, result) = decode_4(&buffer);
+            assert_eq!(rest, b"", "no data remains after decoding");
+
+            assert_eq!(result, c, "same numbers before and after decoding");
+            buffer.clear();
+        }
+    }
 }
 
+/// Expects data to be encoded using quick compression.
+/// Will panic otherwise.
+/// Will encode 4 numbers and return the remaining input data.
 pub fn decode_4(data: &[u8]) -> (&[u8], [u32; 4]) {
     let encoded_decoding_info = data[0];
     // the first 5 bits are the encoded order.
@@ -52,6 +80,7 @@ pub fn decode_4(data: &[u8]) -> (&[u8], [u32; 4]) {
     (rest, nums)
 }
 
+/// Will push encoded numbers to the end of the buffer.
 pub fn encode_4(buffer: &mut Vec<u8>, ns: [u32; 4]) {
     use group_varint_encoding::compress_block;
 

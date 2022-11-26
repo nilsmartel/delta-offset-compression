@@ -17,3 +17,5 @@ categories = ["algorithms", "compression"]
 # Fast algorithm to compress lists if integers in blocks of 4. Appends 0s to blocks, if length…
 group-varint-encoding = "0.1.2"
 
+[dev-dependencies]
+rand = "*"
