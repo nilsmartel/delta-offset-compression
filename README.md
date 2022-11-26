@@ -16,6 +16,11 @@ Advantages when employing this comression in your application are expected to be
 
 _Note, these claims remain to be tested_
 
+## Disadvantages
+
+This compression algorithm does not adapt well to data that is uniformly distributed in the interval of 0 to 2^32
+
+
 ## Compression Scheme
 
 The Scheme compressed 4 numbers at once, by employing *nullsupression, delta-, and offset encoding*.
