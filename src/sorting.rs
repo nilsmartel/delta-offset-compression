@@ -45,6 +45,7 @@ mod tests {
         for t in testdata {
             for encoding in encodings.iter().cloned() {
                 let t1 = apply_encoding(t, encoding);
+                let encoding = encode_sorting_order(encoding);
                 let inverse_encoding = inverse_encoding(encoding);
 
                 let result = apply_encoding(t1, inverse_encoding);
@@ -156,20 +157,6 @@ mod tests {
 
         e
     }
-
-    #[test]
-    fn order_encoding() {
-        // first generate all permutations of 0,1,2,3
-        let p = permut();
-
-        for p1 in p {
-            let e = encode_sorting_order(p1);
-
-            let decoded = decode_sorting_order(e);
-
-            assert_eq!(decoded, p1, "expect to match sorting order {p1:?}");
-        }
-    }
 }
 pub fn encode_sorting_order(order: [u8; 4]) -> u8 {
     // 000aabbc
@@ -181,44 +168,6 @@ pub fn encode_sorting_order(order: [u8; 4]) -> u8 {
     let bb = order[2];
 
     aa << 3 | bb << 1 | c
-}
-
-pub fn decode_sorting_order(order: u8) -> [u8; 4] {
-    // 000aabbc
-    let max = order >> 3;
-    let max2nd = (order >> 1) & 0b11;
-
-    // get the numbers in between.
-    let (a, b) = if max2nd > max {
-        remaining(max, max2nd)
-    } else {
-        remaining(max2nd, max)
-    };
-
-    let c = (order & 1) == 1;
-
-    if c {
-        // a and b need to switch
-        [b, a, max2nd, max]
-    } else {
-        [a, b, max2nd, max]
-    }
-}
-
-/// remaining 2 numbers out of 0..=3, sorted
-/// expects a<b, a!=b, a,b \in 0..=3
-fn remaining(a: u8, b: u8) -> (u8, u8) {
-    match (a, b) {
-        (0, 1) => (2, 3),
-        (0, 2) => (1, 3),
-        (0, 3) => (1, 2),
-
-        (1, 2) => (0, 3),
-        (1, 3) => (0, 2),
-
-        (2, 3) => (0, 1),
-        _ => unreachable!("error in implementation. a:{a}, b:{b}"),
-    }
 }
 
 /// Retuns the proper sorting order and the numbers, sorted.
