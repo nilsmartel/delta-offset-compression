@@ -40,6 +40,11 @@ mod tests {
                 rng.next_u32(),
             ]
         });
+
+        // 4 numbers a 4 bytes
+        let inputlen = 1_000_000 * 4 * 4;
+        let mut outputlen = 0;
+
         let mut buffer = Vec::new();
         for c in cases {
             encode_4(&mut buffer, c);
@@ -47,8 +52,15 @@ mod tests {
             assert_eq!(rest, b"", "no data remains after decoding");
 
             assert_eq!(result, c, "same numbers before and after decoding");
+            outputlen += buffer.len();
             buffer.clear();
         }
+
+        println!("input length:  {inputlen} bytes");
+        println!("output length: {outputlen} bytes");
+        println!("compression rate (higher is better):");
+        let compressionrate = inputlen as f64 / outputlen as f64;
+        println!("{compressionrate}");
     }
 }
 
