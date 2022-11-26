@@ -1,7 +1,15 @@
 [package]
-name = "delta-offset-encoding"
+name = "quick-compression"
 version = "0.1.0"
 edition = "2021"
+
+authors  = ["Nils S. Martel nilsmartel@yahoo.de"]
+description = "Fast algorithm to compress lists if integers in blocks of 4. Appends 0s to blocks, if length of input is not divisable by 4."
+repository = "https://github.com/nilsmartel/quick-compression"
+readme = "./README.md"
+license = "MIT OR Apache-2.0"
+keywords = ["compression", "fast", "int", "list", "array"]
+categories = ["algorithms", "compression"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
