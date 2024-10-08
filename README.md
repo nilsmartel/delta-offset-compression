@@ -51,7 +51,7 @@ where a encodes the first index and so forth.
 
 We have 4 bits left to store our offset.
 That means we have 8 options for our offset.
-The mapping of bits to offset is as follows:
+The mapping of bits to offset masks is as follows:
 
 $$ 000_b \mapsto 0_x $$
 $$ 001_b \mapsto ff_x $$
